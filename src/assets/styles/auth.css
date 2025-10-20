@@ -1,0 +1,152 @@
+*{
+    font-family: "Inter", sans-serif;
+}
+
+.auth-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background-color: #f7f9f8;
+}
+
+.auth-form {
+  width: 30%;
+  min-width: 320px;
+  background-color: #ffffff;
+  padding: 60px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+}
+
+.auth-form h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: #777;
+  margin-bottom: 40px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+input, select {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+input:focus, select:focus {
+  border-color: #7fcdbb;
+  box-shadow: 0 0 0 2px rgba(127, 205, 187, 0.2);
+}
+
+.links {
+  text-align: right;
+  margin-bottom: 25px;
+}
+
+.links a {
+  font-size: 0.9rem;
+  color: #7fcdbb;
+  text-decoration: none;
+}
+
+.links a:hover {
+  color: #5dbda4;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  background-color: #7fcdbb;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+  background-color: #6cc3ae;
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #e74c3c;
+  text-align: center;
+  margin-top: 15px;
+}
+
+.text-center {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.text-center a {
+  color: #7fcdbb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.text-center a:hover {
+  color: #5dbda4;
+}
+
+.auth-illustration {
+  width: 70%;
+  background: linear-gradient(135deg, #8dd3bb, #6cc3ae);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+}
+
+.icon-wrapper {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-text {
+  margin-top: 20px;
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  opacity: 0.95;
+}
+
+@media (max-width: 900px) {
+  .auth-container {
+    flex-direction: column;
+  }
+
+  .auth-form {
+    width: 100%;
+    box-shadow: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .auth-illustration {
+    width: 100%;
+    padding: 60px 0;
+  }
+}

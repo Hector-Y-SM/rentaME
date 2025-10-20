@@ -20,28 +20,27 @@
 
 </script>
 
-<style>
+<style scoped>
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 #app {
+  width: 100%;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
 main {
-  flex: 1;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
   width: 100%;
+  min-height: 100vh;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 </style>

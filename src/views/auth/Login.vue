@@ -1,39 +1,51 @@
 <template>
-  <div class="login-container">
-    <h2>Iniciar Sesión</h2>
-    
-    <form @submit.prevent="handleLogin">
-      <div>
-        <input 
-          v-model="email" 
-          type="email" 
-          placeholder="Email"
-          required
-        />
-      </div>
-      
-      <div>
-        <input 
-          v-model="password" 
-          type="password" 
-          placeholder="Contraseña"
-          required
-        />
-      </div>
-      
-         
-      <router-link to="/forgot-password">recuperar Contraseña</router-link>
-      <button type="submit" :disabled="isLoading">
-        {{ isLoading ? 'Cargando...' : 'Iniciar Sesión' }}
-      </button>
-    </form>
+  <div class="auth-container">
+    <div class="auth-form">
+      <h2>Bienvenido</h2>
+      <p class="subtitle">Inicia sesión para gestionar tus inmuebles</p>
 
-    <p v-if="error" class="error">{{ error }}</p>
-    
-    <p>
-      ¿No tienes cuenta? 
-      <router-link to="/signup">Registrarse</router-link>
-    </p>
+      <form @submit.prevent="handleLogin">
+        <div class="form-group">
+          <input
+            v-model="email"
+            type="email"
+            placeholder="Correo electrónico"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <input
+            v-model="password"
+            type="password"
+            placeholder="Contraseña"
+            required
+          />
+        </div>
+
+        <div class="links">
+          <router-link to="/forgot-password">¿Olvidaste tu contraseña?</router-link>
+        </div>
+
+        <button type="submit" :disabled="isLoading">
+          {{ isLoading ? 'Cargando...' : 'Iniciar sesión' }}
+        </button>
+      </form>
+
+      <p v-if="error" class="error">{{ error }}</p>
+
+      <p class="register">
+        ¿No tienes cuenta?
+        <router-link to="/signup">Regístrate aquí</router-link>
+      </p>
+    </div>
+
+    <div class="auth-illustration">
+      <div class="icon-wrapper">
+        <HouseIcon />
+      </div>
+      <p class="brand-text">Gestor de Inmuebles</p>
+    </div>
   </div>
 </template>
 
@@ -41,6 +53,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/services/useAuth'
+import HouseIcon from '@/components/icons/HouseIcon.vue'
 
 const router = useRouter()
 const { signIn } = useAuth()
@@ -68,37 +81,6 @@ const handleLogin = async () => {
 }
 </script>
 
-<style scoped>
-.login-container {
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 20px;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:disabled {
-  background-color: #ccc;
-}
-
-.error {
-  color: red;
-  margin-top: 10px;
-}
+<style>
+@import '@/assets/styles/auth.css';
 </style>
