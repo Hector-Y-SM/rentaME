@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <AppHeader  v-if="user" />
     <main>
       <RouterView />
     </main>
@@ -8,11 +7,10 @@
 </template>
 
 <script setup>
-  import { onMounted, ref } from 'vue'
-  import AppHeader from './components/AppHeader.vue'
+  import { onMounted } from 'vue'
   import { useAuth } from './services/useAuth'
 
-  const { user, getUser } = useAuth();
+  const { getUser } = useAuth();
   
   onMounted( async () => {
     await getUser();

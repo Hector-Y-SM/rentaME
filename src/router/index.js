@@ -88,13 +88,10 @@ router.beforeEach(async (to, from, next) => {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (to.meta.requiresAuth && !user) {
-    console.log('aqui');
     next('/login')
   } else if (to.path === '/login' && user) {
-    console.log('noo');
     next('/')
   } else {
-    console.log('???');
     next()
   }
 })
