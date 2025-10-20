@@ -2,7 +2,7 @@
   <div class="auth-container">
     <div class="auth-form">
       <h2>Bienvenido</h2>
-      <p class="subtitle">Inicia sesión para gestionar tus inmuebles</p>
+      <p class="subtitle">Inicia sesion para gestionar tus inmuebles</p>
 
       <form @submit.prevent="handleLogin">
         <div class="form-group">
