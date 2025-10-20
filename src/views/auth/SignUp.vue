@@ -21,29 +21,13 @@
             required
           />
         </div>
-        <div class="form-group">
-          <div style="display: flex; gap: 10px;">
-            <select v-model="select" style="width: 30%;">
-              <option disabled value="">Lada</option>
-              <option>+52</option>
-            </select>
-
-            <input 
-              v-model="phoneNumber"
-              type="text"
-              placeholder="Número telefónico"            
-              required
-              style="width: 70%;"
-            />
-          </div>
-        </div>
 
         <button type="submit" :disabled="isLoading">
           {{ isLoading ? 'Cargando...' : 'Registrarse'}}
         </button>
 
         <p class="text-center">
-          <router-link to="/login">Volver al login</router-link>
+          <router-link to="/login">← volver al login</router-link>
         </p>
       </form>
 
@@ -54,7 +38,7 @@
       <div class="icon-wrapper">
         <HouseIcon />
       </div>
-      <p class="brand-text">Únete a Nosotros</p>
+      <p class="brand-text">unete a Nosotros</p>
     </div>
   </div>
 </template>
@@ -65,7 +49,6 @@
   import { useRouter } from 'vue-router';
   import HouseIcon from '@/components/icons/HouseIcon.vue';
 
-  const select = "";
   const { signUp } = useAuth();
   const router = useRouter();
   const phoneNumber = ref('');
@@ -75,6 +58,11 @@
   const isLoading = ref(false);
 
   const handleSignUp = async () => {
+    if (password.value.length < 6) {
+      error.value = 'La contraseña debe tener al menos 6 caracteres'
+      return
+    }
+
     error.value = null;
     isLoading.value = true;
 
@@ -89,7 +77,6 @@
       router.push('/login');
     }
 
-    console.log('creacion ',data);
   }
 </script>
 

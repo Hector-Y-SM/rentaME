@@ -92,5 +92,5 @@ const handleSubmit = async () => {
 </script>
 
 <style>
-@import '@/assets/styles/auth.css';
+  @import '@/assets/styles/auth.css';
 </style>

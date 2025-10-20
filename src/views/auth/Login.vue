@@ -44,7 +44,7 @@
       <div class="icon-wrapper">
         <HouseIcon />
       </div>
-      <p class="brand-text">Gestor de Inmuebles</p>
+      <p class="brand-text">INcontrol</p>
     </div>
   </div>
 </template>
