@@ -1,5 +1,10 @@
 <template>
-  <div class="post-list">
+  <UserData
+    v-if="!loading && firstLogin"
+    :id-user="prop"
+  />
+
+  <!--<div class="post-list">
     <h2>Lista de Posts</h2>
     <div class="filters">
       <input 
@@ -38,16 +43,44 @@
       </router-link>
     </div>
     <button @click="()=> router.push('/')">Inicio</button>
-  </div>
+  </div>-->
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+  import { supabase } from '@/lib/supabase' 
+  import { ref, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
+  import UserData from '@/components/UserData.vue'
 
-const route = useRoute()
-const router = useRouter()
+  const router = useRouter();
+  const loading = ref(true);
+  const firstLogin = ref(false);
+  const prop = ref('');
+  
+  onMounted(async () => {
+    const {data, error: sesionError} = await supabase.auth.getSession();
 
+    if(sesionError || !data.session){
+      router.push('/login');
+    }
+
+    const {data: userID, error} = await supabase
+      .from('user_info')
+      .select('is_initialized')
+      .eq('user_uuid', data.session.user.id) 
+      .single();
+
+    if(!userID.is_initialized){
+      firstLogin.value = true;
+      prop.value = data.session.user.id;
+    } else {
+      firstLogin.value = false;
+    }
+
+    loading.value = false;
+  })
+
+  /*
 const posts = ref([
   { 
     id: 1, 
@@ -133,7 +166,7 @@ watch(() => route.query, () => {
 
 onMounted(() => {
   readQueryParams()
-})
+})*/
 </script>
 
 <style scoped>

@@ -29,7 +29,7 @@ const routes = [
   },
   {
     path: '/posts',
-    name: 'Home',
+    name: 'Posts',
     component: () => import('../views/posts/PostList.vue'),
     meta: { requiresAuth: true }
   },

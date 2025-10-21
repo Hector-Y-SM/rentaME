@@ -64,7 +64,6 @@ const error = ref(null)
 const isLoading = ref(false)
 
 const handleLogin = async () => {
-  console.log('aquiii');
   error.value = null
   isLoading.value = true
   
@@ -74,13 +73,12 @@ const handleLogin = async () => {
   if (loginError) {
     error.value = loginError.message
   } else {
-    router.push('/')
+    router.push('/posts')
   }
 
-  console.log(data);
 }
 </script>
 
 <style>
-@import '@/assets/styles/auth.css';
+  @import '@/assets/styles/auth.css';
 </style>
