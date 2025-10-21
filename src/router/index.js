@@ -50,12 +50,6 @@ const routes = [
     props: true
   },
   {
-    path: '/dashboard',
-    name: 'dashboard',
-    component: () => import('../views/user/Dashboard.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
     path: '/profile',
     name: 'Profile',
     component: () => import('../views/user/Profile.vue'),
