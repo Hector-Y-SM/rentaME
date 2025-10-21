@@ -10,18 +10,6 @@ const routes = [
     component: () => import('../views/auth/Login.vue'),
   },
   {
-    path: '/',
-    name: 'Home',
-    component: () => import('../views/user/Home.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/posts',
-    name: 'Posts',
-    component: () => import('../views/posts/PostList.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
     path: '/signup',
     name: 'SignUp',
     component: () => import('../views/auth/SignUp.vue'),
@@ -38,6 +26,12 @@ const routes = [
     name: 'ForgotPassword',
     component: () => import('../views/auth/ForgotPassword.vue'),
     meta: { requiresAuth: false }
+  },
+  {
+    path: '/posts',
+    name: 'Home',
+    component: () => import('../views/posts/PostList.vue'),
+    meta: { requiresAuth: true }
   },
   {
     // Ruta dinámica con parámetro :id
@@ -84,7 +78,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth && !user) {
     next('/login')
   } else if (to.path === '/login' && user) {
-    next('/')
+    next('/posts')
   } else {
     next()
   }
