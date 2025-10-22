@@ -3,7 +3,10 @@
     v-if="!loading && firstLogin"
     :id-user="prop"
   />
-
+  <div v-else>
+    <h1>Bienveido </h1>
+    <router-link to="/add-property">agregar un nuevo inmueble</router-link>
+  </div>
   <!--<div class="post-list">
     <h2>Lista de Posts</h2>
     <div class="filters">
