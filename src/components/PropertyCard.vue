@@ -45,6 +45,8 @@
 </template>
 
 <script setup>
+import { supabase } from '@/lib/supabase';
+
 const props = defineProps({
   property: {
     type: Object,
@@ -56,7 +58,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['edit']);
+const emit = defineEmits(['edit', 'delete']);
 
 const parseAmenities = (amenitiesString) => {
   try {
@@ -99,6 +101,10 @@ const formatStatus = (status) => {
 
 const handleEdit = () => {
   emit('edit', props.property);
+};
+
+const handleDelete = async () => {
+    emit('delete', props.property)
 };
 </script>
 

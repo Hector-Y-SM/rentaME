@@ -9,7 +9,9 @@
         :property="property"
         :is-editable="true"
         @edit="handleEdit"
+        @delete="handleDelete"
       />
+      <h2 v-if="!properties.length">no haz publicado propiedades aun</h2>
     </div>
   </div>
 </template>
@@ -24,6 +26,24 @@ const properties = ref([]);
 const handleEdit = (property) => {
   console.log('editando propiedad ', property);
 };
+
+const handleDelete = async (property) =>{
+  try {
+    const { error } = await supabase
+      .from('properties')
+      .delete()
+      .eq('property_id', property.property_id); 
+
+    if (error) throw error;
+
+    //actualizar la lista de propiedades
+    properties.value = properties.value.filter(p => p.property_id !== property.property_id);
+    
+  } catch (error) {
+    console.error('error al eliminar:', error.message);
+  }
+
+}
 
 onMounted(async () => {
   try {
