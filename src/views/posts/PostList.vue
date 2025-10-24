@@ -8,13 +8,13 @@
     <router-link to="/add-property">agregar un nuevo inmueble</router-link>
   
     <div class="properties-grid">
-    <PropertyCard
-      v-for="property in properties"
-      :key="property.property_id"
-      :property="property"
-      :is-editable="false"
-    />
-  </div>
+      <PropertyCard
+        v-for="property in properties"
+        :key="property.property_id"
+        :property="property"
+        :is-editable="false"
+      />
+    </div>
   </div>
 
 

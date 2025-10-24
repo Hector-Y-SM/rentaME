@@ -32,6 +32,13 @@
         >
           Editar propiedad
         </button>
+        <button 
+          v-if="isEditable" 
+          @click="handleDelete"
+          class="delete-button"
+        >
+          eliminar propiedad
+        </button>
       </div>
     </div>
   </div>
@@ -197,5 +204,20 @@ const handleEdit = () => {
 
 .edit-button:hover {
   background-color: #6bb3a3;
+}
+
+.delete-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #ec3232;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-button:hover {
+  background-color: #ee1313;
 }
 </style>
