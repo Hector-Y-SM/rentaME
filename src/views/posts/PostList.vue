@@ -13,6 +13,7 @@
         :key="property.property_id"
         :property="property"
         :is-editable="false"
+        :current-user-id="userId"
       />
     </div>
   </div>
@@ -72,7 +73,8 @@
   const loading = ref(true);
   const firstLogin = ref(false);
   const prop = ref('');
-  
+  const userId = ref('');
+
   onMounted(async () => {
     try{
     const {data, error: sesionError} = await supabase.auth.getSession();
@@ -81,6 +83,8 @@
       router.push('/login');
       return
     }
+
+    userId.value = data.session.user.id;
 
     const {data: userID, error} = await supabase
       .from('user_info')
@@ -104,9 +108,10 @@
     const {data: postList, error: errorData} = await supabase
       .from('properties')
       .select('*')
+  
 
-    if(errorData) throw errorData
-    properties.value = postList
+    if(errorData) throw errorData;
+    properties.value = postList;
   } catch (error) {
     console.error('error:', error);
     router.push('/login');

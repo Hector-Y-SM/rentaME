@@ -25,26 +25,45 @@
           {{ formatStatus(property.status) }}
         </span>
 
-        <button 
-          v-if="isEditable" 
-          @click="handleEdit"
-          class="edit-button"
-        >
-          Editar propiedad
-        </button>
-        <button 
-          v-if="isEditable" 
-          @click="handleDelete"
-          class="delete-button"
-        >
-          eliminar propiedad
-        </button>
+        <!-- Add these buttons -->
+        <template v-if="isEditable">
+          <button @click="handleEdit" class="edit-button">
+            Editar propiedad
+          </button>
+          <button @click="handleDelete" class="delete-button">
+            Eliminar propiedad
+          </button>
+          <button 
+            v-if="interestedUsers.length > 0"
+            @click="showInterested"
+            class="interested-button"
+          >
+            Ver interesados ({{ interestedUsers.length }})
+          </button>
+          <button 
+            v-if="property.status === 'rented'"
+            @click="$emit('vacate', property)"
+            class="vacate-button"
+          >
+            Marcar como desocupada
+          </button>
+        </template>
+        <template v-else-if="!isEditable && !isOwner"> <!-- Changed condition -->
+          <button 
+            @click="handleInterest"
+            :class="['interest-button', { 'interested': isInterested }]"
+            :disabled="loading"
+          >
+            {{ isInterested ? 'Ya no me interesa' : 'Me interesa' }}
+          </button>
+        </template>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref, computed } from 'vue';
 import { supabase } from '@/lib/supabase';
 
 const props = defineProps({
@@ -55,10 +74,62 @@ const props = defineProps({
   isEditable: {
     type: Boolean,
     default: false
+  },
+  currentUserId: {
+    type: String,
+    required: true
   }
 });
 
-const emit = defineEmits(['edit', 'delete']);
+const emit = defineEmits(['edit', 'delete', 'showInterested', 'vacate']);
+
+const loading = ref(false);
+const interestedUsers = computed(() => {
+  try {
+    return JSON.parse(props.property.interested_users || '[]');
+  } catch {
+    return [];
+  }
+});
+
+const isOwner = computed(() => {
+  return props.property.owner_uuid === props.currentUserId;
+});
+
+const isInterested = computed(() => {
+  return interestedUsers.value.includes(props.currentUserId);
+});
+
+const handleInterest = async () => {
+  loading.value = true;
+  try {
+    const currentUsers = interestedUsers.value;
+    
+    const newInterestedUsers = isInterested.value
+      ? currentUsers.filter(id => id !== props.currentUserId)
+      : [...currentUsers, props.currentUserId];
+
+    const { error } = await supabase
+      .from('properties')
+      .update({
+        interested_users: JSON.stringify(newInterestedUsers)
+      })
+      .eq('property_id', props.property.property_id)
+      .select();
+
+    if (error) throw error;
+
+    props.property.interested_users = JSON.stringify(newInterestedUsers);
+  } catch (error) {
+    console.error('Error updating interest:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const showInterested = () => {
+  emit('showInterested', props.property);
+};
 
 const parseAmenities = (amenitiesString) => {
   try {
@@ -225,5 +296,66 @@ const handleDelete = async () => {
 
 .delete-button:hover {
   background-color: #ee1313;
+}
+
+.interest-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.interest-button:hover:not(:disabled) {
+  background-color: #4338ca;
+}
+
+.interest-button.interested {
+  background-color: #dc2626;
+}
+
+.interest-button.interested:hover {
+  background-color: #b91c1c;
+}
+
+.interest-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.interested-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #059669;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.interested-button:hover {
+  background-color: #047857;
+}
+
+.vacate-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #8b5cf6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.vacate-button:hover {
+  background-color: #7c3aed;
 }
 </style>
