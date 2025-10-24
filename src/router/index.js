@@ -54,6 +54,16 @@ const routes = [
     props: true
   },
   {
+        // Ruta dinámica con parámetro :id
+    path: '/my-properties',
+    name: 'my-properties',
+    component: () => import('../views/posts/MyProperties.vue'),
+    // Guard: Requiere autenticación para ver detalles
+    meta: { requiresAuth: true },
+    // Pasar el id como prop al componente
+    props: true
+  },
+  {
     path: '/profile',
     name: 'Profile',
     component: () => import('../views/user/Profile.vue'),
