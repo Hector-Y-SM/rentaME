@@ -20,10 +20,13 @@
 import { supabase } from '@/lib/supabase';
 import { ref, onMounted } from 'vue';
 import PropertyCard from '@/components/PropertyCard.vue';
+import { useRouter } from 'vue-router';
 
 const properties = ref([]);
+const router = useRouter()
 
 const handleEdit = (property) => {
+  router.push(`/edit-property/${property.property_id}`)
   console.log('editando propiedad ', property);
 };
 
