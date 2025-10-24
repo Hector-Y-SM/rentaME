@@ -6,7 +6,18 @@
   <div v-else>
     <h1>Bienveido </h1>
     <router-link to="/add-property">agregar un nuevo inmueble</router-link>
+  
+    <div class="properties-grid">
+    <PropertyCard
+      v-for="property in properties"
+      :key="property.property_id"
+      :property="property"
+      :is-editable="false"
+    />
   </div>
+  </div>
+
+
   <!--<div class="post-list">
     <h2>Lista de Posts</h2>
     <div class="filters">
@@ -54,17 +65,21 @@
   import { ref, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import UserData from '@/components/UserData.vue'
+  import PropertyCard from '@/components/PropertyCard.vue'
 
+  const properties = ref([]);
   const router = useRouter();
   const loading = ref(true);
   const firstLogin = ref(false);
   const prop = ref('');
   
   onMounted(async () => {
+    try{
     const {data, error: sesionError} = await supabase.auth.getSession();
 
     if(sesionError || !data.session){
       router.push('/login');
+      return
     }
 
     const {data: userID, error} = await supabase
@@ -73,14 +88,31 @@
       .eq('user_uuid', data.session.user.id) 
       .single();
 
-    if(!userID.is_initialized){
+    if (error) {
+      console.error('Error fetching user info:', error);
+      router.push('/login');
+      return;
+    }
+
+    if(!userID?.is_initialized){
       firstLogin.value = true;
       prop.value = data.session.user.id;
     } else {
       firstLogin.value = false;
     }
 
+    const {data: postList, error: errorData} = await supabase
+      .from('properties')
+      .select('*')
+
+    if(errorData) throw errorData
+    properties.value = postList
+  } catch (error) {
+    console.error('error:', error);
+    router.push('/login');
+  } finally {
     loading.value = false;
+  }
   })
 
   /*
@@ -199,5 +231,12 @@ onMounted(() => {
   color: #666;
   font-size: 0.9em;
   margin: 10px 0;
+}
+
+.properties-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
 }
 </style>
