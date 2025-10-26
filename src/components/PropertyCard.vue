@@ -7,7 +7,7 @@
       <p class="description">{{ property.description }}</p>
       
       <div class="property-details">
-        <p><strong>Dirección:</strong> {{ property.address }}</p>
+        <p><strong>Dirección:</strong> {{ property.address.state }} {{ property.address.city }}</p>
         <p><strong>Precio mensual:</strong> ${{ property.monthly_price }}</p>
         <p><strong>Tiempo de renta:</strong> {{ property.min_lease_term }} - {{ property.max_lease_term }} meses</p>
         <p><strong>Tipo:</strong> {{ formatPropertyType(property.property_type) }}</p>

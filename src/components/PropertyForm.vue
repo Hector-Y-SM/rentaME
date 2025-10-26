@@ -54,15 +54,78 @@
         ></textarea>
       </div>
 
-      <div class="form-group">
-        <label for="address">Dirección</label>
-        <input
-          id="address"
-          v-model="address"
-          type="text"
-          placeholder="Dirección completa"
-          required
-        />
+      <div class="form-group address-section">
+        <h3>Dirección</h3>
+        
+        <div class="address-grid">
+          <div class="form-group">
+            <label for="street">Calle y número</label>
+            <input
+              id="street"
+              v-model="addressDetails.street"
+              type="text"
+              placeholder="Ej: Av. Principal #123"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="neighborhood">Colonia/Barrio</label>
+            <input
+              id="neighborhood"
+              v-model="addressDetails.neighborhood"
+              type="text"
+              placeholder="Ej: Centro"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="postalCode">Código Postal</label>
+            <input
+              id="postalCode"
+              v-model="addressDetails.postalCode"
+              type="text"
+              pattern="[0-9]*"
+              maxlength="5"
+              placeholder="Ej: 12345"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="city">Ciudad</label>
+            <input
+              id="city"
+              v-model="addressDetails.city"
+              type="text"
+              placeholder="Ej: Guadalajara"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="state">Estado</label>
+            <input
+              id="state"
+              v-model="addressDetails.state"
+              type="text"
+              placeholder="Ej: Jalisco"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="country">País</label>
+            <input
+              id="country"
+              v-model="addressDetails.country"
+              type="text"
+              placeholder="Ej: México"
+              required
+            />
+          </div>
+        </div>
       </div>
 
       <div class="form-row">
@@ -171,7 +234,6 @@ const emit = defineEmits(['submit']);
 
 const title = ref(props.propertyData.title || '');
 const description = ref(props.propertyData.description || '');
-const address = ref(props.propertyData.address || '');
 const monthlyPrice = ref(props.propertyData.monthly_price || '');
 const minStay = ref(props.propertyData.min_lease_term || '');
 const maxStay = ref(props.propertyData.max_lease_term || '');
@@ -183,6 +245,15 @@ const error = ref('');
 const photo = ref(null);
 const preview = ref(props.propertyData.main_image_url || null);
 const defaultPropertyImg = 'https://placehold.co/600x400/e2e8f0/cccccc?text=Agregar+Foto';
+
+const addressDetails = ref({
+  street: props.propertyData.address?.street || '',
+  neighborhood: props.propertyData.address?.neighborhood || '',
+  postalCode: props.propertyData.address?.postalCode || '',
+  city: props.propertyData.address?.city || '',
+  state: props.propertyData.address?.state || '',
+  country: props.propertyData.address?.country || ''
+});
 
 const handlePhotoChange = (event) => {
   const file = event.target.files[0];
@@ -201,7 +272,7 @@ const handleSubmit = () => {
   const formData = {
     title: title.value,
     description: description.value,
-    address: address.value,
+    address: addressDetails.value,
     monthly_price: monthlyPrice.value,
     min_lease_term: minStay.value,
     max_lease_term: maxStay.value,
@@ -348,5 +419,29 @@ button[type="submit"]:hover:not(:disabled) {
 button[type="submit"]:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.address-section {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.address-section h3 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.address-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .address-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
