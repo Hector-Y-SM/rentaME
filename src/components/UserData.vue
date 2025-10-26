@@ -133,6 +133,7 @@
             first_name: first_name.value,
             last_name: last_name.value,
             profile_img_url: profileImageUrl,
+            email: user.email,
             is_initialized: true,
           });
       

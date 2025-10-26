@@ -1,63 +1,69 @@
 <template>
   <div class="property-card">
-    <img :src="property.main_image_url" :alt="property.title" class="property-image">
-    
-    <div class="property-content">
-      <h2>{{ property.title }}</h2>
-      <p class="description">{{ property.description }}</p>
+    <!-- Agregar div clickeable alrededor de la imagen y contenido básico -->
+    <div class="property-main" @click="navigateToDetail">
+      <img :src="property.main_image_url" :alt="property.title" class="property-image">
       
-      <div class="property-details">
-        <p><strong>Dirección:</strong> {{ property.address.state }} {{ property.address.city }}</p>
-        <p><strong>Precio mensual:</strong> ${{ property.monthly_price }}</p>
-        <p><strong>Tiempo de renta:</strong> {{ property.min_lease_term }} - {{ property.max_lease_term }} meses</p>
-        <p><strong>Tipo:</strong> {{ formatPropertyType(property.property_type) }}</p>
+      <div class="property-content">
+        <h2>{{ property.title }}</h2>
+        <p class="description">{{ property.description }}</p>
         
-        <div class="amenities">
-          <strong>Servicios incluidos:</strong>
-          <ul>
-            <li v-for="amenity in parseAmenities(property.amenities)" :key="amenity">
-              {{ formatAmenity(amenity) }}
-            </li>
-          </ul>
+        <div class="property-details">
+          <p><strong>Dirección:</strong> {{ property.address.state }} {{ property.address.city }}</p>
+          <p><strong>Precio mensual:</strong> ${{ property.monthly_price }}</p>
+          <p><strong>Tiempo de renta:</strong> {{ property.min_lease_term }} - {{ property.max_lease_term }} meses</p>
+          <p><strong>Tipo:</strong> {{ formatPropertyType(property.property_type) }}</p>
+          
+          <div class="amenities">
+            <strong>Servicios incluidos:</strong>
+            <ul>
+              <li v-for="amenity in parseAmenities(property.amenities)" :key="amenity">
+                {{ formatAmenity(amenity) }}
+              </li>
+            </ul>
+          </div>
+
+          <span :class="['status-badge', property.status]">
+            {{ formatStatus(property.status) }}
+          </span>
         </div>
-
-        <span :class="['status-badge', property.status]">
-          {{ formatStatus(property.status) }}
-        </span>
-
-        <!-- Add these buttons -->
-        <template v-if="isEditable">
-          <button @click="handleEdit" class="edit-button">
-            Editar propiedad
-          </button>
-          <button @click="handleDelete" class="delete-button">
-            Eliminar propiedad
-          </button>
-          <button 
-            v-if="interestedUsers.length > 0"
-            @click="showInterested"
-            class="interested-button"
-          >
-            Ver interesados ({{ interestedUsers.length }})
-          </button>
-          <button 
-            v-if="property.status === 'rented'"
-            @click="$emit('vacate', property)"
-            class="vacate-button"
-          >
-            Marcar como desocupada
-          </button>
-        </template>
-        <template v-else-if="!isEditable && !isOwner"> <!-- Changed condition -->
-          <button 
-            @click="handleInterest"
-            :class="['interest-button', { 'interested': isInterested }]"
-            :disabled="loading"
-          >
-            {{ isInterested ? 'Ya no me interesa' : 'Me interesa' }}
-          </button>
-        </template>
       </div>
+    </div>
+
+    <!-- Los botones de acción se mantienen fuera del área clickeable -->
+    <div class="property-actions">
+      <!-- Add these buttons -->
+      <template v-if="isEditable">
+        <button @click="handleEdit" class="edit-button">
+          Editar propiedad
+        </button>
+        <button @click="handleDelete" class="delete-button">
+          Eliminar propiedad
+        </button>
+        <button 
+          v-if="interestedUsers.length > 0"
+          @click="showInterested"
+          class="interested-button"
+        >
+          Ver interesados ({{ interestedUsers.length }})
+        </button>
+        <button 
+          v-if="property.status === 'rented'"
+          @click="$emit('vacate', property)"
+          class="vacate-button"
+        >
+          Marcar como desocupada
+        </button>
+      </template>
+      <template v-else-if="!isEditable && !isOwner"> <!-- Changed condition -->
+        <button 
+          @click="handleInterest"
+          :class="['interest-button', { 'interested': isInterested }]"
+          :disabled="loading"
+        >
+          {{ isInterested ? 'Ya no me interesa' : 'Me interesa' }}
+        </button>
+      </template>
     </div>
   </div>
 </template>
@@ -65,6 +71,9 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { supabase } from '@/lib/supabase';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const props = defineProps({
   property: {
@@ -176,6 +185,10 @@ const handleEdit = () => {
 
 const handleDelete = async () => {
     emit('delete', props.property)
+};
+
+const navigateToDetail = () => {
+  router.push(`/posts/${props.property.property_id}`);
 };
 </script>
 
@@ -357,5 +370,13 @@ const handleDelete = async () => {
 
 .vacate-button:hover {
   background-color: #7c3aed;
+}
+
+.property-main {
+  cursor: pointer;
+}
+
+.property-actions {
+  padding: 0 1.5rem 1.5rem;
 }
 </style>
