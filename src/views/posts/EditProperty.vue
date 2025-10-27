@@ -79,7 +79,6 @@ const handleSubmit = async (formData) => {
 };
 
 onMounted(async () => {
-  // Cargar datos de la propiedad
   const { data, error } = await supabase
     .from('properties')
     .select('*')

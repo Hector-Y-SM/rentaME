@@ -20,7 +20,7 @@ const MAX_IMAGES = 5;
 const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
 const validateFile = (file) => {
-  console.log('Validating file:', file.type); // Debug log
+  console.log('validando:', file.type); 
   
   if (!file || !file.type) {
     throw new Error('Archivo inválido');
@@ -42,8 +42,6 @@ const handleSubmit = async (formData) => {
     if (userError || !user) {
       throw new Error('inicia sesión antes de continuar.');
     }
-
-    // Validar número de imágenes
     if (formData.photos?.length > MAX_IMAGES) {
       throw new Error(`No puedes subir más de ${MAX_IMAGES} imágenes.`);
     }
@@ -51,14 +49,14 @@ const handleSubmit = async (formData) => {
     let propertyImageUrl = defaultPropertyImg;
     let additionalImages = [];
 
-    // Procesar la imagen principal
+    // procesar la imagen principal
     if (formData.photo && formData.photo instanceof File) {
       validateFile(formData.photo);
       const mainImageUrl = await uploadImage(formData.photo, user.id);
       propertyImageUrl = mainImageUrl;
     }
 
-    // Procesar imágenes adicionales
+    // procesar imágenes adicionales
     if (formData.photos && formData.photos.length > 0) {
       for (const photo of formData.photos) {
         if (photo.file instanceof File) {

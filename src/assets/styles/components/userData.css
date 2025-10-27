@@ -1,0 +1,51 @@
+.photo-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.preview-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #7fcdbb;
+}
+
+.upload-controls {
+    display: flex;
+    gap: 1rem;
+}
+
+.upload-button {
+    background: #7fcdbb;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.upload-button:hover {
+    background: #6bb3a3;
+}
+
+.remove-button {
+    background: #ff4444;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.remove-button:hover {
+    background: #ff2020;
+}
+
+.hidden {
+    display: none;
+}
