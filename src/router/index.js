@@ -28,6 +28,12 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
+    path: '/',
+    name: 'HomeView',
+    component: () => import('../views/HomeView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/posts',
     name: 'Posts',
     component: () => import('../views/posts/PostList.vue'),

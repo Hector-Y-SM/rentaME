@@ -76,7 +76,7 @@
   const userId = ref('');
 
   onMounted(async () => {
-    try{
+    try {
     const {data, error: sesionError} = await supabase.auth.getSession();
 
     if(sesionError || !data.session){
