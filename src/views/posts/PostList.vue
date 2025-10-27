@@ -4,7 +4,7 @@
     :id-user="prop"
   />
   <div v-else>
-    <h1>Bienveido </h1>
+    <h1>Bienvenido </h1>
     <router-link to="/add-property">agregar un nuevo inmueble</router-link>
   
     <div class="properties-grid">

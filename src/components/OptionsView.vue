@@ -2,7 +2,9 @@
   <nav v-if="user && !isRestrictedRoute" class="options-nav">
     <div class="header-section">
       <div class="icon-wrapper">
-        <HouseIcon />
+        <router-link to="/">
+          <HouseIcon />
+        </router-link>
       </div>
       <p class="brand-text">INcontrol</p>
     </div>
@@ -60,5 +62,5 @@
 </script>
 
 <style scoped>
-  @import '../assets/styles/components/optionsView.css'
+  @import '../assets/styles/components/optionsView.css';
 </style>
