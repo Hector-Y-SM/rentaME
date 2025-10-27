@@ -4,15 +4,48 @@
   </p>
   <div class="post-detail" v-if="property">
     <div class="property-header">
-      <img :src="property.main_image_url" :alt="property.title" class="property-image">
-      <div class="property-title">
-        <h1>{{ property.title }}</h1>
-        <span :class="['status-badge', property.status]">
-          {{ formatStatus(property.status) }}
-        </span>
+      <div class="image-carousel">
+        <img 
+          :src="currentImage" 
+          :alt="property.title" 
+          class="property-image"
+        >
+        
+        <button 
+          class="carousel-button prev" 
+          @click="prevImage"
+          :disabled="currentIndex === 0"
+        >
+          &#10094;
+        </button>
+        <button 
+          class="carousel-button next" 
+          @click="nextImage"
+          :disabled="currentIndex === allImages.length - 1"
+        >
+          &#10095;
+        </button>
+
+        <div class="image-counter">
+          {{ currentIndex + 1 }} / {{ allImages.length }}
+        </div>
+
+        <div class="thumbnail-container">
+          <div 
+            v-for="(img, index) in allImages" 
+            :key="index"
+            :class="['thumbnail', { active: currentIndex === index }]"
+            @click="setImage(index)"
+          >
+            <img :src="img" :alt="`Thumbnail ${index + 1}`">
+          </div>
+        </div>
       </div>
     </div>
 
+    <span :class="['status-badge', property.status]">
+      {{ formatStatus(property.status) }}
+    </span>
     <div class="content-grid">
       <div class="property-info">
         <section class="info-section">
@@ -76,86 +109,120 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { supabase } from '@/lib/supabase'
+  import { ref, onMounted, computed } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import { supabase } from '@/lib/supabase'
 
-const route = useRoute()
-const router = useRouter()
-const property = ref(null)
-const ownerInfo = ref(null)
+  const route = useRoute()
+  const router = useRouter()
+  const property = ref(null)
+  const ownerInfo = ref(null)
+  const currentIndex = ref(0)
+  const additionalImages = ref([])
 
-const formatPropertyType = (type) => {
-  const types = {
-    house: 'Casa',
-    apartment: 'Departamento',
-    room: 'Habitación',
-    office: 'Oficina'
+  const formatPropertyType = (type) => {
+    const types = {
+      house: 'Casa',
+      apartment: 'Departamento',
+      room: 'Habitación',
+      office: 'Oficina'
+    }
+    return types[type] || type
   }
-  return types[type] || type
-}
 
-const formatStatus = (status) => {
-  const statuses = {
-    available: 'Disponible',
-    rented: 'Rentada',
-    unavailable: 'No disponible'
+  const formatStatus = (status) => {
+    const statuses = {
+      available: 'Disponible',
+      rented: 'Rentada',
+      unavailable: 'No disponible'
+    }
+    return statuses[status] || status
   }
-  return statuses[status] || status
-}
 
-const formatAmenity = (amenity) => {
-  const amenities = {
-    wifi: 'WiFi',
-    water: 'Agua',
-    electricity: 'Luz',
-    gas: 'Gas',
-    furniture: 'Amueblado',
-    parking: 'Estacionamiento'
+  const formatAmenity = (amenity) => {
+    const amenities = {
+      wifi: 'WiFi',
+      water: 'Agua',
+      electricity: 'Luz',
+      gas: 'Gas',
+      furniture: 'Amueblado',
+      parking: 'Estacionamiento'
+    }
+    return amenities[amenity] || amenity
   }
-  return amenities[amenity] || amenity
-}
 
-const parseAmenities = (amenitiesString) => {
-  try {
-    return JSON.parse(amenitiesString)
-  } catch {
-    return []
+  const parseAmenities = (amenitiesString) => {
+    try {
+      return JSON.parse(amenitiesString)
+    } catch {
+      return []
+    }
   }
-}
 
-const handleContact = () => {
-  if (ownerInfo.value?.email) {
-    window.location.href = `mailto:${ownerInfo.value.email}?subject=Consulta sobre propiedad: ${property.value.title}`
+  const handleContact = () => {
+    if (ownerInfo.value?.email) {
+      window.location.href = `mailto:${ownerInfo.value.email}?subject=Consulta sobre propiedad: ${property.value.title}`
+    }
   }
-}
 
-onMounted(async () => {
-  try {
-    const { data: propertyData, error: propertyError } = await supabase
-      .from('properties')
-      .select('*')
-      .eq('property_id', route.params.id)
-      .single()
+  const allImages = computed(() => {
+    return [property.value?.main_image_url, ...additionalImages.value.map(img => img.image_url)].filter(Boolean)
+  })
 
-    if (propertyError) throw propertyError
+  const currentImage = computed(() => {
+    return allImages.value[currentIndex.value] || ''
+  })
 
-    property.value = propertyData
-
-    const { data: userData, error: userError } = await supabase
-      .from('user_info')
-      .select('*')
-      .eq('user_uuid', propertyData.owner_uuid)
-      .single()
-
-    if (userError) throw userError
-
-    ownerInfo.value = userData
-  } catch (error) {
-    console.error('Error:', error)
-    router.push('/posts')
+  const nextImage = () => {
+    if (currentIndex.value < allImages.value.length - 1) {
+      currentIndex.value++
+    }
   }
-})
+
+  const prevImage = () => {
+    if (currentIndex.value > 0) {
+      currentIndex.value--
+    }
+  }
+
+  const setImage = (index) => {
+    currentIndex.value = index
+  }
+
+  onMounted(async () => {
+    try {
+      const { data: propertyData, error: propertyError } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('property_id', route.params.id)
+        .single()
+
+      if (propertyError) throw propertyError
+      property.value = propertyData
+
+      // Fetch additional images
+      const { data: images, error: imagesError } = await supabase
+        .from('property_images')
+        .select('*')
+        .eq('property_id', route.params.id)
+
+      if (imagesError) throw imagesError
+      additionalImages.value = images || []
+
+      const { data: userData, error: userError } = await supabase
+        .from('user_info')
+        .select('*')
+        .eq('user_uuid', propertyData.owner_uuid)
+        .single()
+
+      if (userError) throw userError
+
+      ownerInfo.value = userData
+    } catch (error) {
+      console.error('Error:', error)
+      router.push('/posts')
+    }
+  })
 </script>
 
 <style scoped>
@@ -177,10 +244,90 @@ onMounted(async () => {
   margin-bottom: 1rem;
 }
 
-.property-title {
+.image-carousel {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 1rem;
+  cursor: pointer;
+  font-size: 1.5rem;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.carousel-button:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.carousel-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.carousel-button.prev {
+  left: 1rem;
+}
+
+.carousel-button.next {
+  right: 1rem;
+}
+
+.image-counter {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.thumbnail-container {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 20px;
+}
+
+.thumbnail {
+  width: 60px;
+  height: 40px;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.thumbnail.active {
+  opacity: 1;
+  border: 2px solid #7fcdbb;
+}
+
+.thumbnail:hover {
+  opacity: 1;
+}
+
+.thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .content-grid {
@@ -260,6 +407,7 @@ onMounted(async () => {
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 500;
+  margin: 1rem 0rem;
 }
 
 .status-badge.available {
@@ -285,6 +433,16 @@ onMounted(async () => {
   .contact-card {
     position: static;
     margin-top: 1.5rem;
+  }
+
+  .carousel-button {
+    padding: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .thumbnail {
+    width: 40px;
+    height: 30px;
   }
 }
 </style>

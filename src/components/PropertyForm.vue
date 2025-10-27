@@ -5,30 +5,77 @@
 
     <form @submit.prevent="handleSubmit">
       <div class="photo-upload">
-        <img 
-          :src="preview || defaultPropertyImg" 
-          alt="Property photo" 
-          class="preview-image"
-        />
-        <div class="upload-controls">
-          <label for="photo" class="upload-button">
-            {{ photo ? 'Cambiar foto' : 'Subir foto' }}
-            <input
-              type="file"
-              id="photo"
-              accept="image/*"
-              @change="handlePhotoChange"
-              class="hidden"
-            />
-          </label>
-          <button 
-            v-if="photo" 
-            type="button" 
-            @click="removePhoto" 
-            class="remove-button"
-          >
-            Quitar foto
-          </button>
+        <div class="main-image">
+          <h3>Imagen Principal</h3>
+          <img 
+            :src="preview || defaultPropertyImg" 
+            alt="Main property photo" 
+            class="preview-image"
+          />
+          <div class="upload-controls">
+            <label for="photo" class="upload-button">
+              {{ photo ? 'Cambiar foto principal' : 'Subir foto principal' }}
+              <input
+                type="file"
+                id="photo"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                @change="handlePhotoChange"
+                class="hidden"
+              />
+            </label>
+            <button 
+              v-if="photo" 
+              type="button" 
+              @click="removePhoto" 
+              class="remove-button"
+            >
+              Quitar foto
+            </button>
+          </div>
+        </div>
+
+        <div class="additional-images">
+          <h3>Imágenes Adicionales (máximo 5)</h3>
+          <div class="images-grid">
+            <div 
+              v-for="(img, index) in additionalImages" 
+              :key="index" 
+              class="image-item"
+            >
+              <img :src="img.preview" :alt="`Additional photo ${index + 1}`">
+              <div class="image-overlay">
+                <select v-model="img.category">
+                  <option value="general">General</option>
+                  <option value="facade">Fachada</option>
+                  <option value="living_room">Sala</option>
+                  <option value="kitchen">Cocina</option>
+                  <option value="bedroom">Habitación</option>
+                  <option value="bathroom">Baño</option>
+                </select>
+                <button @click="removeAdditionalImage(index)" class="remove-button">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+
+            <label 
+              v-if="additionalImages.length < 5"
+              class="add-image-button"
+              :class="{ disabled: additionalImages.length >= 5 }"
+            >
+              <span>+ Agregar imagen</span>
+              <input
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                @change="handleAdditionalImageChange"
+                class="hidden"
+                :disabled="additionalImages.length >= 5"
+              />
+            </label>
+          </div>
+          <p class="image-info">
+            Formatos permitidos: JPG, PNG, WEBP. Tamaño máximo: 5MB por imagen.
+          </p>
         </div>
       </div>
 
@@ -217,7 +264,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps({
   isEditing: {
@@ -246,6 +293,9 @@ const photo = ref(null);
 const preview = ref(props.propertyData.main_image_url || null);
 const defaultPropertyImg = 'https://placehold.co/600x400/e2e8f0/cccccc?text=Agregar+Foto';
 
+const additionalImages = ref([]);
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 const addressDetails = ref({
   street: props.propertyData.address?.street || '',
   neighborhood: props.propertyData.address?.neighborhood || '',
@@ -255,17 +305,51 @@ const addressDetails = ref({
   country: props.propertyData.address?.country || ''
 });
 
-const handlePhotoChange = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    photo.value = file;
-    preview.value = URL.createObjectURL(file);
+const validateFile = (file) => {
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  console.log('File type:', file.type); // Para debugging
+  
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error(`Tipo de archivo no permitido (${file.type}). Solo se permiten imágenes JPG, PNG y WEBP.`);
+  }
+  
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error('El tamaño del archivo excede el límite de 5MB.');
   }
 };
 
-const removePhoto = () => {
-  photo.value = null;
-  preview.value = null;
+const handlePhotoChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    try {
+      validateFile(file);
+      photo.value = file;
+      preview.value = URL.createObjectURL(file);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+};
+
+const handleAdditionalImageChange = (event) => {
+  const file = event.target.files[0];
+  if (file && additionalImages.value.length < 5) {
+    try {
+      validateFile(file);
+      additionalImages.value.push({
+        file,
+        preview: URL.createObjectURL(file),
+        category: 'general'
+      });
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+};
+
+const removeAdditionalImage = (index) => {
+  URL.revokeObjectURL(additionalImages.value[index].preview);
+  additionalImages.value.splice(index, 1);
 };
 
 const handleSubmit = () => {
@@ -278,18 +362,24 @@ const handleSubmit = () => {
     max_lease_term: maxStay.value,
     property_type: propertyType.value,
     amenities: services.value,
-    photo: photo.value,
-    preview: preview.value
+    photo: photo.value, // Should be a File object
+    photos: additionalImages.value.map(img => ({
+      file: img.file, // Should be a File object
+      category: img.category
+    }))
   };
 
   emit('submit', formData);
 };
 
-onMounted(() => {
-  if (props.isEditing && props.propertyData) {
-    // Los datos ya se cargan a través de los refs inicializados con props
-    console.log('Editing property:', props.propertyData);
+// Clean up object URLs when component is destroyed
+onUnmounted(() => {
+  if (preview.value && preview.value.startsWith('blob:')) {
+    URL.revokeObjectURL(preview.value);
   }
+  additionalImages.value.forEach(img => {
+    URL.revokeObjectURL(img.preview);
+  });
 });
 </script>
 
@@ -352,6 +442,80 @@ textarea {
   align-items: center;
   gap: 1rem;
   margin-bottom: 2rem;
+}
+
+.main-image {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.additional-images {
+  width: 100%;
+}
+
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.image-item {
+  position: relative;
+  aspect-ratio: 4/3;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.image-overlay select {
+  padding: 0.25rem;
+  border-radius: 4px;
+  border: none;
+}
+
+.add-image-button {
+  aspect-ratio: 4/3;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-image-button:hover:not(.disabled) {
+  border-color: #7fcdbb;
+  color: #7fcdbb;
+}
+
+.add-image-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.image-info {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.5rem;
 }
 
 .preview-image {
