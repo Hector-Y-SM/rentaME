@@ -114,7 +114,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth && !user) {
     next('/login')
   } else if (to.path === '/login' && user) {
-    next('/posts')
+    next('/')
   } else {
     next()
   }

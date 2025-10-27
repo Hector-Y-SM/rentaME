@@ -7,6 +7,7 @@
         </router-link>
       </div>
       <p class="brand-text">INcontrol</p>
+      <p class="brand-text">{{user.email}}</p>
     </div>
 
     <div class="menu-section">
@@ -38,6 +39,7 @@
     const router = useRouter()
     const route = useRoute()
     const { user, signOut } = useAuth();
+
 
     const restrictedRoutes = [
         '/forgot-password',
