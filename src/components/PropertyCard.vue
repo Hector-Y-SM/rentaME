@@ -30,9 +30,7 @@
       </div>
     </div>
 
-    <!-- Los botones de acción se mantienen fuera del área clickeable -->
     <div class="property-actions">
-      <!-- Add these buttons -->
       <template v-if="isEditable">
         <button @click="handleEdit" class="edit-button">
           Editar propiedad
@@ -55,7 +53,7 @@
           Marcar como desocupada
         </button>
       </template>
-      <template v-else-if="!isEditable && !isOwner"> <!-- Changed condition -->
+      <template v-else-if="!isEditable && !isOwner"> 
         <button 
           @click="handleInterest"
           :class="['interest-button', { 'interested': isInterested }]"
@@ -130,7 +128,7 @@ const handleInterest = async () => {
 
     props.property.interested_users = JSON.stringify(newInterestedUsers);
   } catch (error) {
-    console.error('Error updating interest:', error);
+    console.error('Error ', error);
   } finally {
     loading.value = false;
   }

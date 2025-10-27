@@ -1,4 +1,7 @@
 <template>
+  <p>
+    <router-link to="/posts">← volver</router-link>
+  </p>
   <div class="post-detail" v-if="property">
     <div class="property-header">
       <img :src="property.main_image_url" :alt="property.title" class="property-image">
@@ -121,7 +124,7 @@ const parseAmenities = (amenitiesString) => {
   }
 }
 
-const handleContact = async () => {
+const handleContact = () => {
   if (ownerInfo.value?.email) {
     window.location.href = `mailto:${ownerInfo.value.email}?subject=Consulta sobre propiedad: ${property.value.title}`
   }
@@ -129,7 +132,6 @@ const handleContact = async () => {
 
 onMounted(async () => {
   try {
-    // Fetch property details
     const { data: propertyData, error: propertyError } = await supabase
       .from('properties')
       .select('*')
@@ -140,7 +142,6 @@ onMounted(async () => {
 
     property.value = propertyData
 
-    // Fetch owner information
     const { data: userData, error: userError } = await supabase
       .from('user_info')
       .select('*')
